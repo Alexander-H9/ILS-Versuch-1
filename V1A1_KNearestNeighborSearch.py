@@ -9,8 +9,10 @@ def getKNearestNeighbors(x,X,k=1):  # realizes nearest neighbor search of x in d
     :param k: number of nearest-neighbors to be returned
     :return: return list of k line indixes referring to the k nearest neighbors of x in X
     """
-    d=[]                   # REPLACE! compute list of Euklidean distances between x and X[i]
-    return k*[0]           # REPLACE! return indexes of k smallest distances     
+    d=[np.linalg.norm(X[i]-x) for i in range(len(X))]                   
+    d = np.argsort(d)
+    print("sort d after index: ", d)
+    return d[:k]           
 
 # ***** MAIN PROGRAM ********
 
@@ -21,7 +23,7 @@ print("Data matrix X=\n",X)
 print("Test vector x=",x)
 
 # (ii) Print all Euklidean distances to test vector x
-print("Euklidean distances to x: ", [0 for i in range(len(X))])  # REPLACE! compute list of Euklidean distances   
+print("Euklidean distances to x: ", [np.linalg.norm(X[i]-x) for i in range(len(X))])  # REPLACE! compute list of Euklidean distances   
 
 # (iii) Search for k nearest neighbor
 k=2

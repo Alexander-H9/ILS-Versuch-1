@@ -123,7 +123,12 @@ class KNNClassifier(Classifier):
         """
         if(k==None): k=self.k                      # per default use stored k 
         if(X==None): X=self.X                      # per default use stored X
-        return k*[0]                               # REPLACE: Insert/adapt your code from V1A1_KNearestNeighborSearch.py
+
+        # REPLACE: Insert/adapt your code from V1A1_KNearestNeighborSearch.py
+        d=[np.linalg.norm(X[i]-x) for i in range(len(X))]                   
+        d = np.argsort(d)
+        print("sort d after index: ", d)
+        return d[:k]  
 
     def predict(self,x,k=None):
         """ 
@@ -137,8 +142,10 @@ class KNNClassifier(Classifier):
         """
         if k==None: k=self.k                       # use default parameter k?
         idxKNN = self.getKNearestNeighbors(x,k)    # get indexes of k nearest neighbors of x
-        prediction=0                               # REPLACE DUMMY CODE BY YOUR OWN CODE!
-        pClassPosteriori=self.C*[1.0/self.C]       # REPLACE DUMMY CODE BY YOUR OWN CODE!
+        
+
+        prediction = self.T[idxKNN[0]]             # REPLACE DUMMY CODE BY YOUR OWN CODE!
+        pClassPosteriori=self.C*[1.0/self.C]       # REPLACE DUMMY CODE BY YOUR OWN CODE! Question: how to calulate the propabilities exactly
         return prediction, pClassPosteriori, idxKNN  # return predicted class, a-posteriori-distribution, and indexes of nearest neighbors
 
 

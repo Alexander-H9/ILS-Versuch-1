@@ -125,10 +125,10 @@ class KNNClassifier(Classifier):
         if(X==None): X=self.X                      # per default use stored X
 
         # REPLACE: Insert/adapt your code from V1A1_KNearestNeighborSearch.py
-        d=[np.linalg.norm(X[i]-x) for i in range(len(X))]                   
+        d=[np.linalg.norm(X[i]-x) for i in range(len(X))] 
+        prop = [i/sum(d) for i in d]                  
         d = np.argsort(d)
-        print("sort d after index: ", d)
-        return d[:k]  
+        return d[:k], prop
 
     def predict(self,x,k=None):
         """ 
@@ -141,11 +141,12 @@ class KNNClassifier(Classifier):
         :returns idxKNN: indexes of the k nearest neighbors (ordered w.r.t. ascending distance) 
         """
         if k==None: k=self.k                       # use default parameter k?
-        idxKNN = self.getKNearestNeighbors(x,k)    # get indexes of k nearest neighbors of x
-        
+        idxKNN, prop = self.getKNearestNeighbors(x,k)    # get indexes of k nearest neighbors of x
 
         prediction = self.T[idxKNN[0]]             # REPLACE DUMMY CODE BY YOUR OWN CODE!
-        pClassPosteriori=self.C*[1.0/self.C]       # REPLACE DUMMY CODE BY YOUR OWN CODE! Question: how to calulate the propabilities exactly
+        pClassPosteriori=self.C*[0]                # REPLACE DUMMY CODE BY YOUR OWN CODE! 
+        for i in self.T:
+            pClassPosteriori[i] += prop.pop(0)
         return prediction, pClassPosteriori, idxKNN  # return predicted class, a-posteriori-distribution, and indexes of nearest neighbors
 
 
@@ -202,7 +203,7 @@ if __name__ == '__main__':
     print("Data matrix X=\n",X)
     print("Class labels T=\n",T)
     print("Test vector x=",x)
-    print("Euklidean distances d=",[])                     # REPLACE DUMMY CODE (IF YOU WANT) ...
+    print("Euklidean distances d=",[np.linalg.norm(X[i]-x) for i in range(len(X))])                     
 
     # (ii) Train simple KNN-Classifier
     knnc = KNNClassifier()         # construct kNN Classifier

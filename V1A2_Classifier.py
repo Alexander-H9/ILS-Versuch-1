@@ -2,7 +2,7 @@
 # Python Module for Classification Algorithms
 # Programmgeruest zu Versuch 1, Aufgabe 2
 import numpy as np
-import scipy.spatial
+from scipy.spatial import KDTree
 from random import randint
 
 # ----------------------------------------------------------------------------------------- 
@@ -124,7 +124,6 @@ class KNNClassifier(Classifier):
         if(k==None): k=self.k                      # per default use stored k 
         if(X==None): X=self.X                      # per default use stored X
 
-        # REPLACE: Insert/adapt your code from V1A1_KNearestNeighborSearch.py
         d=[np.linalg.norm(X[i]-x) for i in range(len(X))] 
         prop = [i/sum(d) for i in d]                  
         d = np.argsort(d)
@@ -143,8 +142,8 @@ class KNNClassifier(Classifier):
         if k==None: k=self.k                       # use default parameter k?
         idxKNN, prop = self.getKNearestNeighbors(x,k)    # get indexes of k nearest neighbors of x
 
-        prediction = self.T[idxKNN[0]]             # REPLACE DUMMY CODE BY YOUR OWN CODE!
-        pClassPosteriori=self.C*[0]                # REPLACE DUMMY CODE BY YOUR OWN CODE! 
+        prediction = self.T[idxKNN[0]]             
+        pClassPosteriori=self.C*[0]                 
         for i in self.T:
             pClassPosteriori[i] += prop.pop(0)
         return prediction, pClassPosteriori, idxKNN  # return predicted class, a-posteriori-distribution, and indexes of nearest neighbors
@@ -175,7 +174,7 @@ class FastKNNClassifier(KNNClassifier):
         :returns: - 
         """
         KNNClassifier.fit(self,X,T)                # call to parent class method (just store X and T)
-        self.kdtree = None                         # REPLACE DUMMY CODE BY YOUR OWN CODE! Do an indexing of the feature vectors by constructing a kd-tree
+        self.kdtree = KDTree(X)                # REPLACE DUMMY CODE BY YOUR OWN CODE! Do an indexing of the feature vectors by constructing a kd-tree
         
     def getKNearestNeighbors(self, x, k=None):  # realizes fast K-nearest-neighbor-search of x in data set X
         """
@@ -185,8 +184,8 @@ class FastKNNClassifier(KNNClassifier):
         :return idxNN: return list of k line indexes referring to the k nearest neighbors of x in X
         """
         if(k==None): k=self.k                      # do a K-NN search...
-        idxNN = k*[0]                              # REPLACE DUMMY CODE BY YOUR OWN CODE! Compute nearest neighbors using the KD-Tree
-        return idxNN                               # return indexes of k nearest neighbors
+        erg = self.kdtree.query(x, k)                           
+        return erg[:k]                             # return indexes of k nearest neighbors
 
 
 
@@ -218,4 +217,9 @@ if __name__ == '__main__':
     print("Indexes of the k=",k," nearest neighbors: idx_knn=",idx_knn)
 
     # (iv) Repeat steps (ii) and (iii) for the FastKNNClassifier (based on KD-Trees)
-    # INSERT YOUR CODE
+    Fknnc = FastKNNClassifier()        # construct FkNN Classifier
+    Fknnc.fit(X,T)                     # train with given data
+    erg = Fknnc.getKNearestNeighbors(x, k)
+
+    print("\nClassification with the naive Fast-KNN-classifier:")
+    print("Indexes of the k=",k," nearest neighbors: idx_knn=",erg[1])

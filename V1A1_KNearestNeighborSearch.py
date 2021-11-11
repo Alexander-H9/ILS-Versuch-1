@@ -35,4 +35,3 @@ print("The k Nearest Neighbors of x are the following vectors:")
 for i in range(k):
     idx=idx_knn[i]
     print("The", i+1, "th nearest neighbor is: X[",idx,"]=",X[idx]," with distance ", np.linalg.norm(X[idx]-x))
-

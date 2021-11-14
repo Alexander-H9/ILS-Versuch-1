@@ -20,16 +20,16 @@ print("T_txt[0..9]=\n",T_txt[0:10])
 print("T[0..9]=\n",T[0:10])
 
 # (II) Test KNN-classifier with S-fold cross validation
-S_list=[]                            # parameter S for cross validation; INSERT appropriate values
-K_list=[]                            # number K of nearest neighbors; INSERT appropriate values
+S_list=[100]                            # parameter S for cross validation;
+K_list=[11]                            # number K of nearest neighbors;
 accuracy = np.zeros((len(S_list),len(K_list)));   # array to save accuracy of classifier for each value of S and K
 for i in range(len(S_list)):
     S=S_list[i]                      # do an S-fold cross validation
     for j in range(len(K_list)):
         K=K_list[j]
         t1=clock()                   # start time
-        knnc = 0                              # REPLACE! create appropriate KNN classifier (with kd-trees) 
-        pE,pCE = 0,0                          # REPLACE! Do S-fold cross validation and get error probabilities / confusion matrix
+        fknnc = FastKNNClassifier(C, K)                         
+        pE,pCE = fknnc.crossvalidate(S,X,T)   # Do S-fold cross validation and get error probabilities / confusion matrix
         t2=clock()                            # end time
         time_comp=t2-t1                       # computing time in seconds
         print("\nS=",S," fold cross validation using the",K,"-NNClassifier with KD-Trees yields the following results:")

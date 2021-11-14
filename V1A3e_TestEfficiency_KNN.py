@@ -7,8 +7,8 @@ from V1A2_Classifier import *
 # (i) define parameters K,S,N and 2-dimensional Gaussian
 C=2;
 K=5;
-S=1;
-N_list=[10, 20];                      # REPLACE! Insert list of data set size N as desired
+S=5;
+N_list=[1000, 1000];                      
 mu1, mu2 = [1,1], [3,1]               # expectations for the two classes
 cov1 = [[1,0.5],\
         [0.5,1]]                      # covariance matrix for class 1
@@ -43,12 +43,15 @@ for i in range(len(N_list)):
     print("Computing time = ", time_comp_naive[i], " sec")
 
     # (ii.c) do cross validation for this data set using KNN with KD trees
-    # INSERT CODE AS IN (ii.b) for KNN with kd trees!!!
-    time_comp_kdtree[i]=-1           # REPLACE DUMMY CODE with true computing time
+    fknnc = FastKNNClassifier(C,K)
+    t3=clock() 
+    fpE,fpCE = fknnc.crossvalidate(S,X,T)
+    t4=clock() 
+    time_comp_kdtree[i]= t4-t3           
     print("\nS=",S," fold cross validation using the KD-Tree-KNNClassifier yields the following results:")
-    print("Classification error probability = ", pE)
-    print("Accuracy = ", 1.0-pE)
-    print("Confusion Error Probabilities p(class i|class j) = \n", pCE)
+    print("Classification error probability = ", fpE)
+    print("Accuracy = ", 1.0-fpE)
+    print("Confusion Error Probabilities p(class i|class j) = \n", fpCE)
     print("Computing time = ", time_comp_kdtree[i], " sec")
 
 # (iii) print results

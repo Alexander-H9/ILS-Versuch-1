@@ -173,19 +173,39 @@ class FastKNNClassifier(KNNClassifier):
         :param T: Vector of class labels, must have same length as X, each label should be integer in 0,1,...,C-1
         :returns: - 
         """
-        KNNClassifier.fit(self,X,T)                # call to parent class method (just store X and T)
-        self.kdtree = KDTree(X)                # REPLACE DUMMY CODE BY YOUR OWN CODE! Do an indexing of the feature vectors by constructing a kd-tree
+        KNNClassifier.fit(self,X,T)                 # call to parent class method (just store X and T)
+        self.kdtree = KDTree(X)
+
+    def predict(self,x,k=None):
+        """ 
+        Implementation of classification algorithm, should be overwritten in any derived class
+        :param x: test data vector
+        :returns: label of most likely class that test vector x belongs to (and possibly additional information)
+        """
+        if k==None: k=self.k                       
+        idxKNN, prop = self.getKNearestNeighbors(x,k)    # get indexes of k nearest neighbors of x
+
+        prediction = self.T[idxKNN[1][0]]             
+        pClassPosteriori=self.C*[0]                 
+        for i in self.T:
+            pClassPosteriori[i] += prop.pop(0)
+        return prediction, pClassPosteriori, idxKNN 
         
-    def getKNearestNeighbors(self, x, k=None):  # realizes fast K-nearest-neighbor-search of x in data set X
+    def getKNearestNeighbors(self, x, k=None,X=None):      # realizes fast K-nearest-neighbor-search of x in data set X
         """
         fast computation of the k nearest neighbors for a query vector x given a data matrix X by using the KD-tree
         :param x: the query vector x
         :param k: number of nearest-neighbors to be returned
         :return idxNN: return list of k line indexes referring to the k nearest neighbors of x in X
         """
+        if(k==None): k=self.k                      # per default use stored k 
+        if(X==None): X=self.X                      # per default use stored X
+
         if(k==None): k=self.k                      # do a K-NN search...
-        erg = self.kdtree.query(x, k)                           
-        return erg[:k]                             # return indexes of k nearest neighbors
+        erg = self.kdtree.query(x, k)       
+        d=[np.linalg.norm(X[i]-x) for i in range(len(X))] 
+        prop = [i/sum(d) for i in d]                      
+        return erg[:k], prop                             # return indexes of k nearest neighbors
 
 
 
@@ -217,9 +237,10 @@ if __name__ == '__main__':
     print("Indexes of the k=",k," nearest neighbors: idx_knn=",idx_knn)
 
     # (iv) Repeat steps (ii) and (iii) for the FastKNNClassifier (based on KD-Trees)
-    Fknnc = FastKNNClassifier()        # construct FkNN Classifier
-    Fknnc.fit(X,T)                     # train with given data
-    erg = Fknnc.getKNearestNeighbors(x, k)
+    fknnc = FastKNNClassifier()        # construct FkNN Classifier
+    fknnc.fit(X,T)                     # train with given data
+    fc,fpc,fidx=fknnc.predict(x,k)
 
-    print("\nClassification with the naive Fast-KNN-classifier:")
-    print("Indexes of the k=",k," nearest neighbors: idx_knn=",erg[1])
+    print("Test vector is most likely from class ",fc)
+    print("A-Posteriori Class Distribution: prob(x is from class i)=",fpc)
+    print("Indexes of the k=",k," nearest neighbors: idx_knn=",fidx[1])

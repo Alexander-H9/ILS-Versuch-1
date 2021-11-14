@@ -10,7 +10,7 @@ from V1A2_Classifier import *
 
 # (i) create some synthetic data (2-dimensional Gaussian)
 C=2                               # two classes
-N1,N2=500,500                     # N1 and N2 data vectors for the two classes
+N1,N2=100,100                     # N1 and N2 data vectors for the two classes
 mu1, mu2 = [1,1], [3,1]           # expectations for the two classes
 sigma1 = [[1,0.5],\
           [0.5,1]]                # covariance matrix for class 1
@@ -21,11 +21,15 @@ X2 = np.random.multivariate_normal(mu2,sigma2,(N2))    # Gaussian data vectors f
 T1,T2 = N1*[0],N2*[1]             # corresponding class labels 
 X = np.concatenate((X1,X2))       # entire data set
 T = np.concatenate((T1,T2))       # entire label set
+m1 = np.sum(X1,0).T/N1            # mean of X1
+m2 = np.sum(X2,0).T/N2            # mean of X2
+print("m1: ", m1)
+print("m2: ", m2)
 N,D = X.shape[0], X.shape[1]      # size of data set
 print("Data size: N=",N,", D=",D)
 
 # (ii) create and test classifiers
-k,S = 5,10                        # k=number of nearest neighbors; S=number of data subsets for cross validation
+k,S = 5,1                        # k=number of nearest neighbors; S=number of data subsets for cross validation
 X_test = np.array([[2,1],[5,1],[-1,1]])   # Some additional data vectors to be tested 
 
 # (ii.a) test of naive KNN classifier
@@ -44,7 +48,17 @@ for x_test in X_test:             # Test some additional data vectors x_test fro
 
 # (ii.b) test of KD-tree KNN classifier
 print("\nFast KNN Classifier based on KD-Trees:","\n---------------------------------------")
-t_kdtree,pE_kdtree,pCE_kdtree=-1,-1,-1      # REPLACE BY YOUR OWN CODE
+fknnc = FastKNNClassifier(C,k)
+t3=clock()
+pE_kdtree,pCE_kdtree = fknnc.crossvalidate(S,X,T)
+t4=clock()
+t_kdtree=t4-t3
+print("S=", S, " fold Cross-Validation of Fast ", k, "-NN-Classifier requires ", t_kdtree, " seconds. Confusion error probability matrix is \n", pCE_kdtree)
+print("Probability of a classification error is pE = ", pE_kdtree)
+for x_test in X_test:             # Test some additional data vectors x_test from X_test         
+    t_test,p_class,idxNN = fknnc.predict(x_test,k)
+    print("New data vector x_test=", x_test, " is most likely from class ", t_test, "; class probabilities are p_class = ", p_class)
+
 
 # (iii) plot data
 f=plt.figure()

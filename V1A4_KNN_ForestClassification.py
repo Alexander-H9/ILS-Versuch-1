@@ -21,7 +21,7 @@ print("T[0..9]=\n",T[0:10])
 
 # (II) Test KNN-classifier with S-fold cross validation
 S_list=[100]                            # parameter S for cross validation;
-K_list=[11]                            # number K of nearest neighbors;
+K_list=[11]                             # number K of nearest neighbors;
 accuracy = np.zeros((len(S_list),len(K_list)));   # array to save accuracy of classifier for each value of S and K
 for i in range(len(S_list)):
     S=S_list[i]                      # do an S-fold cross validation

@@ -2,6 +2,7 @@
 # Python Module for Classification Algorithms
 # Programmgeruest zu Versuch 1, Aufgabe 2
 import numpy as np
+from numpy.testing._private.utils import clear_and_catch_warnings
 from scipy.spatial import KDTree
 from random import randint
 
@@ -139,13 +140,21 @@ class KNNClassifier(Classifier):
         :returns pClassPosteriori: A-Posteriori probabilities, pClassPosteriori[i] is probability that x belongs to class i
         :returns idxKNN: indexes of the k nearest neighbors (ordered w.r.t. ascending distance) 
         """
-        if k==None: k=self.k                       # use default parameter k?
-        idxKNN, prop = self.getKNearestNeighbors(x,k)    # get indexes of k nearest neighbors of x
+        if k==None: k=self.k                                    # use default parameter k?
+        idxKNN, prop = self.getKNearestNeighbors(x,k)           # get indexes of k nearest neighbors of x
+        
 
+        pClassPosteriori = self.C*[0]
+        klassenLabels = []                                  
+
+        for label in idxKNN:                                    # get labels of the NN
+            klassenLabels.append(T[label])
+
+        for i in klassenLabels:
+            pClassPosteriori[i] += 1/k
+            
         prediction = self.T[idxKNN[0]]             
-        pClassPosteriori=self.C*[0]                 
-        for i in self.T:
-            pClassPosteriori[i] += prop.pop(0)
+
         return prediction, pClassPosteriori, idxKNN  # return predicted class, a-posteriori-distribution, and indexes of nearest neighbors
 
 
